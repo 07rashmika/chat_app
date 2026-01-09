@@ -7,20 +7,19 @@ class AuthScreen extends StatefulWidget {
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+class _AuthScreenState extends State<AuthScreen> {
+  final _formKey = GlobalKey<FormState>();
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(vsync: this);
-  }
+  var _isLogin = true;
+  var _enteredEmail = '';
+  var _enteredPassword = '';
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  void _submit() {
+    final isValid = _formKey.currentState!.validate();
+
+    if (isValid) {
+      _formKey.currentState!.save();
+    }
   }
 
   @override
@@ -48,6 +47,7 @@ class _AuthScreenState extends State<AuthScreen>
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Form(
+                      key: _formKey,
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -58,12 +58,56 @@ class _AuthScreenState extends State<AuthScreen>
                             keyboardType: TextInputType.emailAddress,
                             autocorrect: false,
                             textCapitalization: TextCapitalization.none,
+                            validator: (value) {
+                              if (value == null ||
+                                  value.trim().isEmpty ||
+                                  !value.contains('@')) {
+                                return 'Please enter a valid email';
+                              }
+
+                              return null;
+                            },
+                            onSaved: (newValue) {
+                              _enteredEmail = newValue!;
+                            },
                           ),
                           TextFormField(
                             decoration: const InputDecoration(
                               labelText: 'Password',
                             ),
                             obscureText: true,
+                            validator: (value) {
+                              if (value == null || value.trim().length < 8) {
+                                return 'Password must be at least 8 characters long';
+                              }
+
+                              return null;
+                            },
+                            onSaved: (newValue) {
+                              _enteredPassword = newValue!;
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          ElevatedButton(
+                            onPressed: _submit,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.primaryContainer,
+                            ),
+                            child: Text(_isLogin ? 'Login' : 'Signup'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _isLogin = !_isLogin;
+                              });
+                            },
+                            child: Text(
+                              _isLogin
+                                  ? 'Create an account'
+                                  : 'I already have an account',
+                            ),
                           ),
                         ],
                       ),
