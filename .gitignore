@@ -55,4 +55,4 @@ android/app/google-services.json
 
 # iOS Firebase  
 ios/Runner/GoogleService-Info.plist
-ios/firebase_app_id_file.json
+ios/firebase_app_id_file.json*.backup
